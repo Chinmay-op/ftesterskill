@@ -1,0 +1,1 @@
+{ "name": "@f-tester/core", "version": "1.0.0", "main": "index.js", "dependencies": { "playwright": "^1.60.0", "pngjs": "^7.0.0", "pixelmatch": "^7.2.0" } }

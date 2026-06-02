@@ -1,0 +1,1 @@
+{ "name": "@f-tester/cli", "version": "1.0.0", "main": "index.js", "dependencies": { "commander": "^12.1.0", "cosmiconfig": "^9.0.0", "@f-tester/core": "*", "@f-tester/reporter": "*", "@f-tester/personas": "*", "@f-tester/heuristics": "*" } }

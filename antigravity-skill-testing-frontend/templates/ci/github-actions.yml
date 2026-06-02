@@ -1,0 +1,44 @@
+name: f-tester UI Checks
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+      
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps chromium
+
+    - name: Run f-tester suite
+      run: npx f-tester run-all
+      
+    - name: Upload Test Report & Screenshots
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: f-tester-results
+        path: |
+          output/report.md
+          output/report.json
+          output/screenshots/
+          output/traces/
+        retention-days: 7

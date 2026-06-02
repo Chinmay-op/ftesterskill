@@ -4,13 +4,18 @@
 
 You can use it in any web project (React, Vue, Next.js, etc.) regardless of your IDE.
 
+## Documentation
+- [Getting Started](docs/getting-started.md)
+- [Configuration Guide](docs/configuration.md)
+- [Persona-Driven Testing](docs/personas.md)
+- [UX Heuristics](docs/heuristics.md)
+- [CI Integration](docs/ci.md)
+- [Reporters (Markdown & JSON)](docs/reporter.md)
+- [Contributing](CONTRIBUTING.md)
+
 ---
 
 ## 1. Using it as a Standalone CLI
-
-You can run `f-tester` directly against your project's build output to scan for exposed secrets, bundle size bloat, UX anti-patterns, or run DOM tests.
-
-### Installation & Usage
 
 You don't need to install anything to try it out. Just use `npx` in your project folder:
 

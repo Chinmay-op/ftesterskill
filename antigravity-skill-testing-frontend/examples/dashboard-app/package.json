@@ -1,0 +1,9 @@
+{
+  "name": "dashboard-app-template",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "webpack --mode production",
+    "preview": "serve dist -p 4173",
+    "test:ui": "f-tester run-all"
+  }
+}

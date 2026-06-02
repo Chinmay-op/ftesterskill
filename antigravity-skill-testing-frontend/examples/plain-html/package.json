@@ -1,0 +1,12 @@
+{
+  "name": "plain-html-example",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "mkdir -p dist && cp index.html dist/",
+    "preview": "npx serve dist -p 4173",
+    "test:ui": "npx f-tester run-all"
+  },
+  "dependencies": {
+    "serve": "^14.0.0"
+  }
+}

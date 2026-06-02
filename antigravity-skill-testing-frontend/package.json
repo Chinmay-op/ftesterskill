@@ -2,10 +2,13 @@
   "name": "f-tester",
   "version": "1.0.0",
   "description": "An open-source CLI tool for comprehensive frontend testing and UI checking",
-  "main": "index.js",
+  "main": "packages/cli/index.js",
   "bin": {
-    "f-tester": "bin/cli.js"
+    "f-tester": "packages/cli/bin/cli.js"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,13 +16,17 @@
     "antigravity",
     "skill",
     "testing",
-    "frontend"
+    "frontend",
+    "qa",
+    "playwright"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "pixelmatch": "^7.2.0",
     "playwright": "^1.60.0",
-    "pngjs": "^7.0.0"
+    "pngjs": "^7.0.0",
+    "commander": "^12.1.0",
+    "cosmiconfig": "^9.0.0"
   }
 }

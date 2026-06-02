@@ -20,8 +20,13 @@ async function runDomTests(projectDir = '.', previewPort = 4173) {
   const screenshotsDir = path.join(outputDir, 'screenshots');
   const reportFile = path.join(outputDir, 'dom-report.txt');
 
+  const tracesDir = path.join(outputDir, 'traces');
+
   if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir, { recursive: true });
+  }
+  if (!fs.existsSync(tracesDir)) {
+    fs.mkdirSync(tracesDir, { recursive: true });
   }
 
   console.log("═══════════════════════════════════════════════════════");
@@ -80,6 +85,7 @@ async function runDomTests(projectDir = '.', previewPort = 4173) {
       process.stdout.write(`   │  Testing ${route} ... `);
 
       try {
+        await context.tracing.start({ screenshots: true, snapshots: true });
         await page.goto(`${previewUrl}${route}`, { waitUntil: 'networkidle', timeout: 15000 });
         await page.waitForTimeout(2000); // Let animations settle
         await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -89,15 +95,18 @@ async function runDomTests(projectDir = '.', previewPort = 4173) {
           console.log("⚠️  WARNING (tiny screenshot — possible blank page)");
           reportContent += `  [WARN] ${route} @ ${vp.label}: Screenshot only ${stats.size} bytes\n`;
           failCount++;
+          await context.tracing.stop({ path: path.join(tracesDir, `trace-${routeSlug}-${vp.label}.zip`) });
         } else {
           console.log("✅");
           reportContent += `  [PASS] ${route} @ ${vp.label}: ${screenshotName}\n`;
           passCount++;
+          await context.tracing.stop();
         }
       } catch (err) {
         console.log("❌ FAIL");
         reportContent += `  [FAIL] ${route} @ ${vp.label}: Capture failed - ${err.message}\n`;
         failCount++;
+        await context.tracing.stop({ path: path.join(tracesDir, `trace-${routeSlug}-${vp.label}.zip`) });
       }
     }
     await context.close();
