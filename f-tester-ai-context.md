@@ -16,9 +16,9 @@ When a user asks the AI to "Check my UI", "Run a frontend test", or similar prom
 
 ## 2. Core Execution Workflow
 
-The AI agent must follow a **Plan-Validate-Execute** pattern. It executes a comprehensive 10-domain checklist in a specific order:
+The AI agent must follow a **Plan-Validate-Execute** pattern. It executes a comprehensive 13-domain checklist in a specific order:
 
-### The 10 Domains of Testing:
+### The 13 Domains of Testing:
 1. **Build & Environment Validation:** Validates clean builds, `.env` syncs, and no stray debug statements (console.logs) in production.
 2. **Security & Leakage Checks:** Uses `scan-leakage.sh` to check for exposed API keys, un-substituted environment variables, hardcoded internal IPs, and PII leaks.
 3. **API Endpoint Testing:** Validates REST/GraphQL responses, status codes, OpenAPI schemas, rate limiting, and CORS headers.
@@ -29,9 +29,12 @@ The AI agent must follow a **Plan-Validate-Execute** pattern. It executes a comp
 8. **Browser-Based DOM & Visual Testing:** Uses **Playwright CLI** and a preview server (`npm run preview`) to capture screenshots (`output/screenshots/`) for page loads, interactive states, navs, responsive breakpoints, and visual regressions against baselines.
 9. **Point of Breakage Detection (Critical):** Goes beyond finding *that* it broke to finding *where/why*. Hooks into `page.on('pageerror')`, intercepts network requests, tracks memory leaks (via heap snapshots), and detects CSS/DOM mutation breakages.
 10. **Cross-Cutting Quality Checks:** Blocks third-party scripts to test resilience, checks keyboard-only navigation, scroll behavior, and dark mode toggling.
+11. **Persona-Driven User Journeys:** Replaces robotic automation with goal-based execution. Uses defined personas (e.g., "Impatient mobile user", "First-time visitor") with specific patience and knowledge levels. Tracks hesitation, unneeded steps, abandonment risk, and outputs a step-by-step human narrative.
+12. **UX Heuristic Evaluation:** A secondary evaluation passing all findings against Nielsen's 10 heuristics. Categorizes issues by Clarity, Feedback, Control, Consistency, and Trust. Evaluates the cognitive load of each flaw.
+13. **Perceived Quality & Trust Signals:** Automatically checks UI feedback latency (time from click to change), scans microcopy for ambiguous CTAs ("Submit" vs "Save Changes"), audits semantic locator health (ensuring elements are discoverable by accessibility roles instead of just CSS classes), and lists non-breaking experience debt.
 
-### Prerequisite for Domains 8–10:
-The AI MUST spin up a preview server (`npm run build && npm run preview` on `http://localhost:4173`) and use the **Antigravity Browser Subagent** + **Playwright CLI** for browser interactions. It must create directories `output/screenshots`, `output/baselines`, and `output/heap-snapshots`.
+### Prerequisite for Domains 8–13:
+The AI MUST spin up a preview server (`npm run build && npm run preview` on `http://localhost:4173`) and use the **Antigravity Browser Subagent** + **Playwright CLI** for browser interactions. It must create directories `output/screenshots`, `output/baselines`, and `output/heap-snapshots`. Furthermore, it must strictly adhere to the **Selector Policy**, prioritizing semantic locators (`getByRole`, `getByLabel`) over brittle CSS queries.
 
 ---
 
@@ -44,13 +47,20 @@ The skill requires the AI to generate a **rich, human-readable report** structur
 2. **Health Score 🏥:** Letter grade (A+ to F), an ASCII progress bar, and issue counts by severity.
 3. **Domain Results at a Glance 📊:** Summary table with status, issues, time, and screenshot links.
 4. **Executive Summary 🧠:** 3-5 sentences hitting the biggest win and top concern.
-5. **Domain Detail Sections (1–10):** Detailed breakdown of passed/failed checks. Explanations must cover WHAT went wrong, WHERE, and a suggested fix, with embedded screenshots.
+5. **Domain Detail Sections (1–13):** Detailed breakdown of passed/failed checks. Explanations must cover WHAT went wrong, WHERE, and a suggested fix, with embedded screenshots.
 6. **Memory & Performance Profile 🧠:** Included inside Domain 9. Shows an ASCII box comparing JS Heap sizes, DOM nodes, and detached nodes before/after idle periods.
 7. **Point of Breakage Log 🔴:** A log of specific breakages detailing the trigger action, impact, file/line location, screenshot, and an actionable fix.
-8. **Visual Evidence Index 📸:** Table of all captured screenshots with context.
-9. **Skipped Domains ⏭️:** Table of any skipped domains with the reason WHY.
-10. **Recommendations 💡:** Prioritized fixes (Critical 🔴, High 🟠, Medium 🟡, Low 🔵).
-11. **Test Execution Timeline 📋:** Chronological table of test completion.
+8. **User Personas Tested 👤:** Table of the personas used in Domain 11 testing, with context and patience level.
+9. **Critical User Journeys 🎯:** Table logging task success/failure per persona, steps taken, friction scores, and abandonment risk.
+10. **Hesitation Map ⏸️:** Logs where the tester paused, retried, backtracked, or got confused.
+11. **Usability Heuristic Violations 🔍:** Table of heuristic tags and cognitive load mappings for all UI issues found.
+12. **Confidence Narrative 💬:** Step-by-step prose narrative tracing the user's emotional state (Clear, Uncertain, Confusing, Misleading) throughout each journey.
+13. **Semantic Locator Health 🏷️:** A health audit of whether interactive elements are discoverable by role/label versus brittle CSS fallbacks.
+14. **Experience Debt Summary ⚠️:** Issues that degrade UX trust/polish but aren't hard crashes (Clarity, Trust, Efficiency, Polish).
+15. **Visual Evidence Index 📸:** Table of all captured screenshots with context.
+16. **Skipped Domains ⏭️:** Table of any skipped domains with the reason WHY.
+17. **Recommendations 💡:** Prioritized fixes (Critical 🔴, High 🟠, Medium 🟡, Low 🔵).
+18. **Test Execution Timeline 📋:** Chronological table of test completion.
 
 ---
 
