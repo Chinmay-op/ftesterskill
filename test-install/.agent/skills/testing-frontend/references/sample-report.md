@@ -13,18 +13,18 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                                                             │
-│          ██████████████████░░░░░░░░░░     72/100            │
+│          ██████████████████░░░░░░░░░░     69/100            │
 │                                                             │
-│          Grade: B                                           │
+│          Grade: C+                                          │
 │                                                             │
-│          7 of 10 domains passed                             │
-│          11 issues found                                    │
-│          2 critical · 3 high · 4 medium · 2 low             │
+│          9 of 13 domains passed                             │
+│          17 issues found                                    │
+│          2 critical · 4 high · 7 medium · 4 low             │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**What this means:** Good foundation, but the app has issues that should be fixed before
+**What this means:** Solid engineering foundation, but the human-like UX evaluation revealed
 production. The two critical issues (silent API error handling and an uncaught TypeError on
 the dashboard) are the most urgent. The rest is polish.
 
@@ -44,6 +44,9 @@ the dashboard) are the most urgent. The rest is polish.
 | 8 | Browser DOM & Visual | ⚠️ | 2 | Medium | 48s | [14 screenshots](output/screenshots/) |
 | 9 | Point of Breakage | ❌ | 2 | Critical | 62s | [3 screenshots](output/screenshots/) |
 | 10 | Cross-Cutting Quality | ✅ | 0 | — | 35s | [6 screenshots](output/screenshots/) |
+| 11 | Persona User Journeys | ⚠️ | 3 | High | 45s | [4 screenshots](output/screenshots/) |
+| 12 | UX Heuristic Evaluation | ❌ | 3 | High | 12s | — |
+| 13 | Perceived Quality & Trust | ⚠️ | 2 | Medium | 18s | [2 screenshots](output/screenshots/) |
 
 ---
 
@@ -467,6 +470,164 @@ theme switching is instantaneous and consistent.
 
 ---
 
+## 👤 User Personas Tested
+
+| Persona | Context | Device | Patience | Knowledge |
+|---------|---------|--------|----------|----------|
+| First-time visitor | Has never seen this product. Arrived from a Google search. | Desktop (1440×900) | Medium | None |
+| Impatient mobile user | On phone, commuting, low bandwidth. Will abandon in 3s. | Mobile (375×812) | Very low | Moderate |
+| Error-prone user | Not tech-savvy. Types slowly. Often makes form mistakes. | Desktop (1440×900) | Medium | Low |
+
+---
+
+## 🎯 Critical User Journeys
+
+| Journey | Persona | Success | Steps | Unnecessary | Hesitations | Friction | Abandonment Risk |
+|---------|---------|:-------:|:-----:|:-----------:|:-----------:|:--------:|:----------------:|
+| Understand product and find sign-up | First-time visitor | ✅ | 3 | 0 | 1 | 2.5/10 | Low |
+| Complete login with mistakes and recover | Error-prone user | ✅ | 4 | 2 | 1 | 4.0/10 | Medium |
+| Generate a threat proposal on mobile | Impatient mobile user | ❌ | 5 | 2 | 3 | 7.5/10 | High |
+
+**Failed journey detail:** The impatient mobile user tried to generate a proposal from the
+dashboard but encountered three friction points: (1) the "Generate Proposal" button was
+partially clipped on mobile, requiring horizontal scroll to reach, (2) the form loaded
+with no indication of required fields, and (3) after submitting, the loading spinner
+showed for 4+ seconds with no progress context ("Generating..."). The user would likely
+abandon at step 3.
+
+---
+
+## ⏸️ Hesitation Map
+
+| # | Journey | Step | Location | What happened | Impact |
+|:-:|---------|------|----------|---------------|--------|
+| 1 | Sign-up discovery | Step 2 | Homepage hero | First-time visitor paused — the CTA said "Get Started" but was styled like a text link, not a button. They almost missed it. | Delay (2s) |
+| 2 | Login recovery | Step 1 | /login form | Error-prone user submitted empty form. Validation errors appeared but didn't scroll to the first error field. User looked confused. | Confusion |
+| 3 | Mobile proposal | Step 2 | /dashboard | Impatient mobile user couldn't see the "Generate" button without scrolling right. No visual cue that more content existed off-screen. | Near-abandonment |
+| 4 | Mobile proposal | Step 4 | /dashboard | After clicking "Generate", spinner showed "Loading..." with no context. User tapped twice thinking the first click didn't register. | Frustration |
+
+---
+
+## 🔍 Usability Heuristic Violations
+
+| # | Route | Issue | Heuristic(s) | Severity | Why This Confuses Humans | Cognitive Load | Fix |
+|:-:|-------|-------|-------------|:--------:|--------------------------|:--------------:|-----|
+| 1 | /dashboard | Infinite spinner on API failure | H1, H9 | 🔴 Critical | The user has no idea if the page is loading, broken, or waiting. They're stuck with no way to recover. | High | Add error state with retry button to the ThreatDashboard query hook. |
+| 2 | /dashboard | "Generate Proposal" button clipped on mobile | H7, H3 | 🟠 High | Mobile users can't see or reach the primary action without discovering horizontal scroll exists. | High | Make the button full-width on mobile or move it above the fold. |
+| 3 | /login | "Forgot password?" link has 3.8:1 contrast | H8 | 🔵 Low | Users with any visual impairment may not see this link at all. It fades into the background. | Low | Change color from #999 to #767676 for WCAG AA compliance. |
+| 4 | / | "Get Started" CTA looks like a text link | H4, H6 | 🟡 Medium | Users expect primary CTAs to look like buttons. A text-styled link is easy to miss on first scan. | Medium | Style as a prominent button with background color and padding. |
+| 5 | /proposals | Empty state shows blank white space | H1, H10 | 🟡 Medium | New users see nothing — no hint that they need to create something, no guidance on next steps. | Medium | Add empty state illustration with "Create your first proposal" CTA. |
+| 6 | /dashboard | Loading text says "Loading..." not "Loading threats..." | H1 | 🟡 Medium | The user doesn't know what's loading. Multiple sections could be loading simultaneously. | Low | Use contextual loading messages: "Loading threat data..." |
+
+### Heuristic Cluster Summary
+
+| Cluster | Heuristics | Violations | Worst Severity |
+|---------|------------|:----------:|:--------------:|
+| Clarity | H2, H6, H8 | 2 | 🟡 Medium |
+| Feedback | H1, H9 | 3 | 🔴 Critical |
+| Control | H3, H5, H7 | 1 | 🟠 High |
+| Consistency | H4 | 1 | 🟡 Medium |
+| Trust | H1, H9, H10 | 2 | 🔴 Critical |
+
+The biggest cluster is **Feedback** — the app doesn't communicate clearly when things
+are loading, when they fail, or what the user should do about it.
+
+---
+
+## 💬 Confidence Narrative
+
+### Journey: "Complete login with mistakes and recover" — Error-prone user
+
+> **Step 1** ❌ — The error-prone user lands on the login page and immediately hits
+> "Sign In" without filling anything out. Two validation errors appear — but they
+> appear below the fold, and the page doesn't scroll to them. The user stares at
+> the unchanged form for a moment, confused. After scrolling down, they see the errors.
+> *Confidence: Confusing.*
+>
+> **Step 2** ✅ — They type "not-an-email" into the email field and a short password.
+> This time they see an inline error: "Please enter a valid email address." The
+> message is clear and specific. *Confidence: Clear.*
+>
+> **Step 3** ✅ — They correct the email to test@example.com and enter a proper password.
+> They click Sign In. The button shows a brief spinner, then the page navigates to the
+> dashboard. The transition felt natural. *Confidence: Clear.*
+
+### Journey: "Generate a threat proposal on mobile" — Impatient mobile user
+
+> **Step 1** ✅ — The user opens the dashboard on their phone. The layout adapts to
+> mobile — cards stack vertically, the hamburger menu works. So far, so good.
+> *Confidence: Clear.*
+>
+> **Step 2** ❌ — They want to generate a proposal, but the "Generate Proposal" button
+> is off-screen to the right. There's no horizontal scroll indicator. They scroll up
+> and down looking for it, tap the hamburger menu, check Settings. After 8 seconds of
+> searching, they accidentally discover horizontal scroll. *Confidence: Confusing.*
+>
+> **Step 3** ⚠️ — They tap the button. A form appears, but no fields are marked as
+> required. They fill in some fields and skip others, unsure what's mandatory.
+> *Confidence: Uncertain.*
+>
+> **Step 4** 🚫 — They tap "Submit". A spinner appears with the text "Loading..."
+> — no indication of what's happening or how long it'll take. After 4 seconds, they
+> tap again, worried the first tap didn't register. Now they're not sure if they
+> submitted twice. *Confidence: Misleading.*
+>
+> **Step 5** ❌ — The page refreshes but they can't tell if the proposal was created.
+> There's no success message, no toast, no redirect. They'd likely abandon.
+> *Confidence: Confusing.*
+
+---
+
+## 🏷️ Semantic Locator Health
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  🏷️ SEMANTIC LOCATOR HEALTH                               │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Total interactive elements:  34                            │
+│  Discoverable by role/label:  29 (85%)          ✅           │
+│  Requires testid fallback:    3                 ⚠️           │
+│  Requires CSS fallback:       2                 ❌           │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Control | Route | By Role/Label? | Fallback Used | Concern |
+|---------|-------|:--------------:|---------------|--------|
+| Theme toggle icon | /dashboard | ❌ | `.theme-toggle` CSS class | No aria-label — screen readers can't identify this control |
+| Chart filter dropdown | /dashboard | ❌ | `select.chart-filter` CSS class | No accessible name — keyboard users can't identify the dropdown purpose |
+| Threat card expand | /dashboard | ⚠️ | `data-testid="threat-expand"` | Has testid but no aria-label. Acceptable for testing but not for accessibility. |
+
+85% of controls are semantically discoverable — that's solid. The two CSS-only controls
+(theme toggle and chart filter) need aria-labels urgently.
+
+---
+
+## ⚠️ Experience Debt Summary
+
+### Clarity Debt
+- The "Get Started" CTA on the homepage looks like a text link, not a button — first-time visitors may miss it.
+- Empty proposal/threat lists show blank white space instead of guidance.
+- Form fields lack required-field indicators (asterisks or "Required" labels).
+
+### Trust Debt
+- Two API endpoints silently fail, showing infinite spinners instead of error messages.
+- The loading text "Loading..." doesn't specify what's loading — feels vague.
+- Going offline shows a blank white screen with no explanation.
+
+### Efficiency Debt
+- The "Generate Proposal" button is hidden by horizontal scroll on mobile.
+- No keyboard shortcuts for power users (e.g., Ctrl+N for new proposal).
+- Form submission on error doesn't auto-focus the first invalid field.
+
+### Polish Debt
+- Dashboard CLS of 0.12 — threat count cards push content down on load.
+- "Forgot password?" link contrast is below WCAG AA minimum.
+- No `prefers-reduced-motion` support for hover animations.
+
+---
+
 ## 📸 Visual Evidence Index
 
 All screenshots captured during this test run:
@@ -487,8 +648,14 @@ All screenshots captured during this test run:
 | 12 | [threats-empty.png](output/screenshots/threats-empty.png) | /dashboard | Desktop | Empty threat list — blank area (no empty state UI) |
 | 13 | [breakage-001.png](output/screenshots/breakage-001.png) | /dashboard | Desktop | POB-001: React error boundary after TypeError |
 | 14 | [breakage-002.png](output/screenshots/breakage-002.png) | /dashboard | Desktop | POB-002: Console warnings visible in DevTools |
+| 15 | [journey-first-time-step2.png](output/screenshots/journey-first-time-step2.png) | / | Desktop | First-time visitor hesitation — CTA looks like text link |
+| 16 | [journey-mobile-step2.png](output/screenshots/journey-mobile-step2.png) | /dashboard | Mobile | Generate button clipped off-screen |
+| 17 | [journey-mobile-step4.png](output/screenshots/journey-mobile-step4.png) | /dashboard | Mobile | Vague "Loading..." spinner — no context |
+| 18 | [journey-error-prone-step1.png](output/screenshots/journey-error-prone-step1.png) | /login | Desktop | Validation errors below fold |
+| 19 | [ux-eval-dashboard.png](output/screenshots/ux-eval-dashboard.png) | /dashboard | Desktop | UX evaluation screenshot |
+| 20 | [ux-eval-root.png](output/screenshots/ux-eval-root.png) | / | Desktop | UX evaluation — homepage |
 
-**Total screenshots:** 14
+**Total screenshots:** 20
 **Saved to:** `output/screenshots/`
 **Baselines:** `output/baselines/` (14 baselines captured — first run)
 
@@ -567,10 +734,13 @@ All screenshots captured during this test run:
 | 1:42 | Domain 8 (Browser DOM & Visual) — ⚠️ 2 medium issues, 14 screenshots |
 | 2:44 | Domain 9 (Point of Breakage) — ❌ 2 breakages, memory profile clean |
 | 3:19 | Domain 10 (Cross-Cutting Quality) — ✅ all passed |
-| 4:18 | Test run completed |
+| 4:04 | Domain 11 (Persona Journeys) — ⚠️ 3 persona journeys, 1 failed |
+| 4:16 | Domain 12 (UX Heuristics) — ❌ 6 violations found |
+| 4:34 | Domain 13 (Perceived Quality) — ⚠️ 2 trust issues |
+| 5:33 | Test run completed |
 
 ---
 
 *Report generated by Antigravity Frontend Testing Agent · Wednesday, May 28 2025*
-*Skill version: testing-frontend v2.0 (10-domain)*
+*Skill version: testing-frontend v3.0 (13-domain + human-like UX)*
 *Total screenshots: 14 · Total issues: 11 · Health grade: B (72/100)*

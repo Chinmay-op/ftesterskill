@@ -62,6 +62,9 @@ to their team, not a machine spitting out logs.
 | 8 | Browser DOM & Visual | ✅ or ❌ | [n] | [worst severity] | [Xs] | [screenshot links] |
 | 9 | Point of Breakage | ✅ or ❌ | [n] | [worst severity] | [Xs] | [screenshot links] |
 | 10 | Cross-Cutting Quality | ✅ or ❌ | [n] | [worst severity] | [Xs] | [screenshot links] |
+| 11 | Persona User Journeys | ✅ or ❌ | [n] | [worst severity] | [Xs] | [screenshot links] |
+| 12 | UX Heuristic Evaluation | ✅ or ❌ | [n] | [worst severity] | [Xs] | — |
+| 13 | Perceived Quality & Trust | ✅ or ❌ | [n] | [worst severity] | [Xs] | [screenshot links] |
 
 ---
 
@@ -386,6 +389,130 @@ SEO:           [████████████████████]  [
 
 ---
 
+## 👤 User Personas Tested
+
+<!-- List every persona used in Domain 11 testing -->
+
+| Persona | Context | Device | Patience | Knowledge |
+|---------|---------|--------|----------|----------|
+| [First-time visitor] | [Has never seen this product] | Desktop | Medium | None |
+| [Impatient mobile user] | [On phone, low bandwidth] | Mobile | Very low | Moderate |
+| [Error-prone user] | [Not tech-savvy, makes mistakes] | Desktop | Medium | Low |
+| [add more...] | | | | |
+
+---
+
+## 🎯 Critical User Journeys
+
+<!-- One row per persona × journey combination -->
+
+| Journey | Persona | Success | Steps | Unnecessary | Hesitations | Friction | Abandonment Risk |
+|---------|---------|:-------:|:-----:|:-----------:|:-----------:|:--------:|:----------------:|
+| [goal description] | [persona name] | ✅/❌ | [n] | [n] | [n] | [0-10] | Low/Med/High |
+| [goal description] | [persona name] | ✅/❌ | [n] | [n] | [n] | [0-10] | Low/Med/High |
+
+<!-- For each failed or high-friction journey, explain what went wrong in human terms -->
+
+---
+
+## ⏸️ Hesitation Map
+
+<!-- Document every point where a persona hesitated, retried, or backtracked -->
+
+| # | Journey | Step | Location | What happened | Impact |
+|:-:|---------|------|----------|---------------|--------|
+| 1 | [goal] | [step #] | [route/element] | [The user paused because...] | [confusion / delay / abandonment] |
+| 2 | [goal] | [step #] | [route/element] | [The user retried because...] | [confusion / delay / abandonment] |
+
+---
+
+## 🔍 Usability Heuristic Violations
+
+<!-- Every finding tagged against Nielsen's heuristics -->
+
+| # | Route | Issue | Heuristic(s) | Severity | Why This Confuses Humans | Cognitive Load | Fix |
+|:-:|-------|-------|-------------|:--------:|--------------------------|:--------------:|-----|
+| 1 | [route] | [description] | H1, H9 | 🔴/🟠/🟡/🔵 | [plain-language explanation] | High/Med/Low | [one-sentence fix] |
+| 2 | [route] | [description] | [H#] | 🔴/🟠/🟡/🔵 | [plain-language explanation] | High/Med/Low | [one-sentence fix] |
+
+### Heuristic Cluster Summary
+
+| Cluster | Heuristics | Violations | Worst Severity |
+|---------|------------|:----------:|:--------------:|
+| Clarity | H2, H6, H8 | [n] | [severity] |
+| Feedback | H1, H9 | [n] | [severity] |
+| Control | H3, H5, H7 | [n] | [severity] |
+| Consistency | H4 | [n] | [severity] |
+| Trust | H1, H9, H10 | [n] | [severity] |
+
+---
+
+## 💬 Confidence Narrative
+
+<!-- Step-by-step replay of each journey in human terms. Write as prose. -->
+
+### Journey: [GOAL_DESCRIPTION] — [PERSONA_NAME]
+
+> [Write a paragraph-by-paragraph narrative of what the user experienced.
+> Include what they saw, what they expected, where they hesitated, and
+> how they felt at each step. Use the confidence annotations (✅ Clear /
+> ⚠️ Uncertain / ❌ Confusing / 🚫 Misleading) to guide the tone.]
+>
+> **Step 1** ✅ — [narrative sentence]
+>
+> **Step 2** ⚠️ — [narrative sentence explaining the hesitation]
+>
+> **Step 3** ❌ — [narrative sentence explaining the confusion]
+
+<!-- Repeat for each journey -->
+
+---
+
+## 🏷️ Semantic Locator Health
+
+<!-- How discoverable are interactive elements through semantic locators? -->
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  🏷️ SEMANTIC LOCATOR HEALTH                               │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Total interactive elements:  [XX]                          │
+│  Discoverable by role/label:  [XX] ([XX]%)     ✅            │
+│  Requires testid fallback:    [XX]              ⚠️            │
+│  Requires CSS fallback:       [XX]              ❌            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Control | Route | By Role/Label? | Fallback Used | Concern |
+|---------|-------|:--------------:|---------------|--------|
+| [button/input/link name] | [route] | ✅/❌ | [testid / CSS selector] | [concern or —] |
+
+---
+
+## ⚠️ Experience Debt Summary
+
+<!-- Issues that don't crash the app but make it feel worse -->
+
+### Clarity Debt
+<!-- Confusing labels, missing help text, jargon -->
+- [issue description]
+
+### Trust Debt
+<!-- Silent failures, vague states, broken feedback loops -->
+- [issue description]
+
+### Efficiency Debt
+<!-- Unnecessary steps, missing shortcuts, poor defaults -->
+- [issue description]
+
+### Polish Debt
+<!-- Inconsistent spacing, clipped text, missing empty states -->
+- [issue description]
+
+---
+
 ## 📸 Visual Evidence Index
 
 All screenshots captured during this test run:
@@ -452,4 +579,4 @@ All screenshots captured during this test run:
 ---
 
 *Report generated by Antigravity Frontend Testing Agent · [DATE]*
-*Skill version: testing-frontend v2.0 (10-domain)*
+*Skill version: testing-frontend v3.0 (13-domain + human-like UX)*

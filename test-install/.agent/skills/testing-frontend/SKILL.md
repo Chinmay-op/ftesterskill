@@ -3,12 +3,14 @@ name: testing-frontend
 description: >
   Runs comprehensive frontend tests across UI components, API endpoints,
   security/data leakage, accessibility, performance, network behavior,
-  browser-based DOM/visual testing, point-of-breakage detection, and
-  cross-cutting quality checks. Uses Antigravity Browser Subagent + Playwright
-  CLI for live DOM inspection and visual regression. Triggers when the user
-  mentions frontend testing, QA, audit, endpoint testing, security scan,
-  browser testing, visual regression, breakage detection, or wants to validate
-  a web application.
+  browser-based DOM/visual testing, point-of-breakage detection, cross-cutting
+  quality checks, persona-driven user journeys, UX heuristic evaluation, and
+  perceived quality/trust signal analysis. Uses Antigravity Browser Subagent +
+  Playwright CLI for live DOM inspection, visual regression, and human-like
+  behavioral testing. Triggers when the user mentions frontend testing, QA,
+  audit, endpoint testing, security scan, browser testing, visual regression,
+  breakage detection, UX review, usability testing, persona testing, or wants
+  to validate a web application.
 ---
 
 # Comprehensive Frontend Testing
@@ -24,6 +26,10 @@ description: >
 - User asks for browser testing, DOM testing, or visual regression
 - User mentions Playwright, screenshot testing, or breakage detection
 - User wants to find "where exactly something breaks" or "point of failure"
+- User asks for a UX review, usability audit, or "does this feel right to a user?"
+- User mentions personas, user journeys, friction, or abandonment
+- User asks about microcopy, terminology clarity, or trust signals
+- User wants to know if a flow is intuitive or confusing
 - User asks for responsive testing, dark mode check, or keyboard navigation audit
 
 ## Workflow
@@ -44,6 +50,9 @@ this checklist and update it as each domain completes:
 - [ ] 8. Browser-Based DOM & Visual Testing
 - [ ] 9. Point of Breakage Detection
 - [ ] 10. Cross-Cutting Quality Checks
+- [ ] 11. Persona-Driven User Journeys
+- [ ] 12. UX Heuristic Evaluation
+- [ ] 13. Perceived Quality & Trust Signals
 ```
 
 ### Execution order
@@ -57,7 +66,10 @@ this checklist and update it as each domain completes:
 7. **Network & State** seventh — test edge cases and resilience.
 8. **Browser-Based DOM & Visual** eighth — live browser verification with screenshots.
 9. **Point of Breakage Detection** ninth — find exactly where and why things break.
-10. **Cross-Cutting Quality** last — theme, keyboard, scroll, third-party resilience.
+10. **Cross-Cutting Quality** tenth — theme, keyboard, scroll, third-party resilience.
+11. **Persona-Driven User Journeys** eleventh — simulate real user intents with different personas.
+12. **UX Heuristic Evaluation** twelfth — second-pass analysis classifying findings against usability heuristics.
+13. **Perceived Quality & Trust Signals** last — feedback latency, microcopy, trust, and semantic locator health.
 
 ### Browser Test Prerequisite (Domains 8–10)
 
@@ -77,6 +89,28 @@ mkdir -p output/screenshots output/baselines output/heap-snapshots
 Use the **Antigravity Browser Subagent** + **Playwright CLI** for all browser
 interactions. Every test that touches the UI **must** save a screenshot to
 `output/screenshots/`.
+
+---
+
+### Selector Policy (Mandatory for Domains 8–13)
+
+All Playwright interactions **must** use the following locator hierarchy, in
+order of preference. This ensures tests mirror how real users perceive the
+interface and exposes accessibility gaps when semantic locators fail.
+
+1. **`getByRole`** — e.g., `page.getByRole('button', { name: 'Submit' })`
+2. **`getByLabel`** — e.g., `page.getByLabel('Email address')`
+3. **`getByPlaceholder`** — e.g., `page.getByPlaceholder('Enter your email')`
+4. **`getByText`** — e.g., `page.getByText('Sign up')`
+5. **`getByTestId`** — e.g., `page.getByTestId('submit-btn')`
+6. **CSS/XPath** — last resort only
+
+**Rules:**
+- If a control is **only** discoverable by CSS/XPath or testid, report it as a
+  **Semantic Locator Gap** in the report (Domain 13).
+- Never use CSS selectors when a role or label locator would work.
+- When a semantic locator fails, log the failure and fall back — but flag it as
+  an accessibility concern.
 
 ---
 
@@ -416,6 +450,196 @@ Confirm per breakpoint:
 
 ---
 
+### 11. Persona-Driven User Journeys
+
+> **Purpose:** Test the app from the perspective of realistic human personas,
+> not just a robotic automation path. Different users notice different failures.
+> See [persona-journey-runner.ts](examples/persona-journey-runner.ts) for the
+> execution template.
+
+#### 11a. Define Personas
+
+Before running journeys, define at least 3 personas from this list (adapt to
+the app's domain):
+
+| Persona | Device | Patience | Knowledge | Likely Mistakes |
+|---------|--------|----------|-----------|-----------------|
+| **First-time visitor** | Desktop | Medium | None — unfamiliar with product terms | Skips onboarding, misreads CTAs |
+| **Returning authenticated user** | Desktop | Low | Familiar with layout | Skips instructions, expects shortcuts |
+| **Impatient mobile user** | Mobile (375×812) | Very low | Moderate | Taps wrong targets, abandons on slow load |
+| **Keyboard-only user** | Desktop | High | High | None — relies entirely on Tab/Enter/Escape |
+| **Error-prone user** | Desktop | Medium | Low | Submits invalid data, clicks back mid-flow |
+| **Low-context user** | Desktop | Medium | None — unfamiliar with domain jargon | Confused by internal terminology |
+
+Each persona alters: navigation style, retry count, device viewport, and
+interpretation of labels.
+
+#### 11b. Define Goal-Based Journeys
+
+Convert features into real user intents. Examples:
+- "Sign up and verify whether the value proposition is clear."
+- "Add an item and verify confidence before payment."
+- "Recover from a bad form submission."
+- "Find a past record without knowing internal terminology."
+- "Complete the primary task on mobile with one hand."
+
+Each journey must be tied to a specific persona.
+
+#### 11c. Execute and Score Journeys
+
+For each persona × journey combination, track and report:
+
+- **Task success:** Did the persona complete the goal? (yes / partial / no)
+- **Total steps taken:** How many clicks/actions were needed?
+- **Unnecessary steps:** Steps that didn't advance the goal (detours, retries, wrong clicks)
+- **Hesitation points:** Where the persona would pause, unsure what to do next
+- **Recovery points:** Where the persona hit an error and had to recover
+- **Friction score:** 0 (effortless) to 10 (severely frustrating)
+- **Abandonment risk:** Low / Medium / High — would this persona give up?
+- **Confidence annotations per step:** Clear ✅ / Uncertain ⚠️ / Confusing ❌ / Misleading 🚫
+
+#### 11d. Journey Narrative Replay
+
+For each journey, write a **step-by-step narrative** in human terms:
+
+> "The first-time visitor lands on the homepage and sees a 'Get Started' button.
+> They click it, but the next page asks for a 'Workspace ID' — a term they've
+> never seen. They hesitate for several seconds, look for a tooltip or help link,
+> find none, and abandon the flow."
+
+This narrative is the most actionable output for product and design teams.
+
+#### 11e. Accessibility-Integrated Journey Reruns
+
+Rerun at least one critical journey in these modes:
+- **Keyboard-only mode** — Tab through the entire flow, no mouse
+- **Zoomed to 200%** — Confirm text is readable and layout doesn't break
+- **Focus-order map** — Document the Tab order through the journey and flag illogical jumps
+
+---
+
+### 12. UX Heuristic Evaluation
+
+> **Purpose:** Classify all findings (from every domain) against recognized
+> usability heuristics. This turns subjective UX concerns into a repeatable
+> evaluation framework.
+
+#### 12a. Heuristic Taxonomy
+
+Apply these 10 heuristics (based on Nielsen's heuristics) to every finding:
+
+| # | Heuristic | What to check |
+|:-:|-----------|---------------|
+| H1 | **Visibility of system status** | Does the UI always tell the user what's happening? Loading states, progress indicators, confirmation messages. |
+| H2 | **Match to real-world language** | Does the UI use words the user understands, or internal jargon? |
+| H3 | **User control and freedom** | Can the user undo, go back, cancel, or escape? Are there emergency exits? |
+| H4 | **Consistency and standards** | Are similar actions/elements styled and labeled consistently? Do they follow platform conventions? |
+| H5 | **Error prevention** | Does the UI prevent errors before they happen? (e.g., input masks, disabled buttons when incomplete, confirmation dialogs) |
+| H6 | **Recognition over recall** | Is information visible when needed, or does the user have to remember it from a previous screen? |
+| H7 | **Flexibility and efficiency** | Are there shortcuts for experienced users? Can power users skip steps? |
+| H8 | **Aesthetic clarity / minimal design** | Is the UI free of unnecessary clutter? Does every element serve a purpose? |
+| H9 | **Error recognition and recovery** | Are error messages clear, specific, and actionable? Do they help the user fix the problem? |
+| H10 | **Help and documentation** | Is contextual help available? Tooltips, inline hints, FAQ links? |
+
+#### 12b. Tag Every Finding
+
+For every issue found across all 13 domains, add:
+- **Heuristic violated:** H1–H10 (can be multiple)
+- **Why this confuses humans:** One sentence in plain language
+- **Cognitive load impact:** Low / Medium / High
+
+Example:
+> **Issue:** Dashboard shows infinite spinner on API failure.
+> **Heuristic:** H1 (Visibility of status), H9 (Error recovery).
+> **Why this confuses humans:** "The user has no idea if the page is still
+> loading, if something failed, or if they should wait. They're stuck."
+> **Cognitive load:** High.
+
+#### 12c. Cluster Issues
+
+Group all heuristic violations into these 5 buckets for the report:
+1. **Clarity** — Can the user understand what they're seeing? (H2, H6, H8)
+2. **Feedback** — Does the UI communicate what happened? (H1, H9)
+3. **Control** — Can the user navigate freely and recover? (H3, H5, H7)
+4. **Consistency** — Is the experience predictable? (H4)
+5. **Trust** — Does the UI feel reliable and professional? (H1, H9, H10)
+
+---
+
+### 13. Perceived Quality & Trust Signals
+
+> **Purpose:** Catch issues that don't break the app but degrade user confidence,
+> clarity, and perceived polish. These are the issues that make users think
+> "this feels cheap" or "I don't trust this."
+> See [ux-heuristic-evaluator.ts](examples/ux-heuristic-evaluator.ts) for
+> automated checks and [check-ux-signals.sh](scripts/check-ux-signals.sh)
+> for source-level scanning.
+
+#### 13a. Feedback Latency Checks
+
+After every button click or form submission, measure time-to-UI-acknowledgement:
+- **< 100ms:** Excellent — feels instant
+- **100ms–300ms:** Good — noticeable but acceptable
+- **300ms–1000ms:** Needs loading indicator
+- **> 1000ms without feedback:** Flag as **trust violation** — user doesn't know if click registered
+
+#### 13b. Trust Signal Audit
+
+Check for these trust-damaging patterns:
+- Vague loading states ("Loading..." with no context vs. "Loading your proposals...")
+- Silent failures (API error with no user-visible message)
+- Suspicious disabled buttons (disabled with no tooltip explaining why)
+- Broken or missing favicons
+- Mixed HTTP/HTTPS content
+- Generic error messages ("Something went wrong" with no detail or action)
+
+#### 13c. Microcopy & Terminology Review
+
+Scan all user-facing text for:
+- **Ambiguous CTA labels:** "Submit", "Click here", "OK", "Go", "Continue" without context
+- **Internal jargon:** Technical terms that a non-technical user wouldn't understand
+- **Inconsistent terminology:** Same concept called different names in different places
+  (e.g., "Workspace" vs. "Project" vs. "Space")
+- **Missing helper text:** Form fields with no placeholder, label, or hint
+
+Run the static scanner:
+```bash
+bash scripts/check-ux-signals.sh ./src
+```
+
+#### 13d. Layout Confidence Checks
+
+- **CLS (Cumulative Layout Shift):** Flag any route with CLS > 0.1
+- **Clipped text:** Check for `text-overflow: ellipsis` on critical content
+  (titles, prices, error messages) — users can't read what's cut off
+- **Hidden affordances:** Interactive elements that look like plain text
+  (links without underline/color, clickable divs without cursor:pointer)
+- **Inconsistent spacing:** Visually uneven padding/margins in repeated elements
+
+#### 13e. Semantic Locator Health Audit
+
+For every interactive element on every route:
+1. Attempt to locate it via `getByRole` → `getByLabel` → `getByPlaceholder` → `getByText`
+2. If the element is **only** discoverable via CSS selector or testid, flag it as a
+   **Semantic Locator Gap**
+3. Report:
+   - Total interactive elements audited
+   - Elements discoverable by role/label (good)
+   - Elements requiring testid fallback (acceptable)
+   - Elements requiring CSS fallback (poor — indicates accessibility concern)
+
+#### 13f. Experience Debt Summary
+
+Compile a final list of issues that do NOT break the app but degrade the
+experience. These are "experience debt" — technical debt's UX equivalent.
+Categorize by:
+- **Clarity debt** — confusing labels, missing help text, jargon
+- **Trust debt** — silent failures, vague states, broken feedback loops
+- **Efficiency debt** — unnecessary steps, missing shortcuts, poor defaults
+- **Polish debt** — inconsistent spacing, clipped text, missing empty states
+
+---
+
 ## Reporting Format
 
 > **MANDATORY:** Every test run must produce a rich, human-readable report as a markdown
@@ -437,7 +661,7 @@ The report **must** include all of the following sections, in this order:
    issue count, worst severity, time taken, and screenshot links
 4. **🧠 Executive Summary** — 3-5 sentences. Mention the biggest win and the top
    concern. This is what a PM or lead reads first.
-5. **Domain Detail Sections (1–10)** — One `###` section per domain with:
+5. **Domain Detail Sections (1–13)** — One `###` section per domain with:
    - Status badge and time taken
    - Table of individual checks with ✅/❌/⚠️/N/A results
    - For each failure: human-readable explanation of WHAT went wrong, WHERE,
@@ -456,16 +680,29 @@ The report **must** include all of the following sections, in this order:
    - File + line location if available
    - Embedded screenshot
    - One actionable fix sentence
-8. **📸 Visual Evidence Index** — Table of ALL screenshots with: number, file link,
-   route/element, viewport, and human description of what it shows
-9. **⏭️ Skipped Domains** — Table with domain name and clear reason WHY
-10. **💡 Recommendations** — Prioritized by severity:
+8. **👤 User Personas Tested** — Table: persona name, context, device, patience level
+9. **🎯 Critical User Journeys** — Table: task, persona, success/fail, friction score,
+   trust score, abandonment risk, steps taken, unnecessary steps
+10. **⏸️ Hesitation Map** — Where the tester paused, retried, backtracked, or needed
+    extra cues. One row per hesitation point with location, trigger, and impact.
+11. **🔍 Usability Heuristic Violations** — Table: issue, heuristic(s) broken,
+    severity, "why this confuses humans" explanation, cognitive load, suggested fix
+12. **💬 Confidence Narrative** — Step-by-step journey replay in human terms:
+    what the user likely felt, saw, and did at each step. Written as prose.
+13. **🏷️ Semantic Locator Health** — Table: control, route, discoverable by
+    role/label?, fallback selector used, accessibility concern
+14. **⚠️ Experience Debt Summary** — Issues that don't break the app but degrade
+    clarity, trust, or efficiency. Categorized by: clarity / trust / efficiency / polish.
+15. **📸 Visual Evidence Index** — Table of ALL screenshots with: number, file link,
+    route/element, viewport, and human description of what it shows
+16. **⏭️ Skipped Domains** — Table with domain name and clear reason WHY
+17. **💡 Recommendations** — Prioritized by severity:
     - 🔴 Critical (fix before shipping)
     - 🟠 High (fix this sprint)
     - 🟡 Medium (add to backlog)
     - 🔵 Low (nice to have)
     Each recommendation is one actionable sentence a developer can act on immediately.
-11. **📋 Test Execution Timeline** — Table showing `Time | Event` for each domain
+18. **📋 Test Execution Timeline** — Table showing `Time | Event` for each domain
     completion, with status emoji
 
 ### Writing Style Rules
@@ -499,23 +736,27 @@ The report **must** include all of the following sections, in this order:
   - [capture-baselines.sh](scripts/capture-baselines.sh) — First-run screenshot baseline capture
   - [diff-screenshots.sh](scripts/diff-screenshots.sh) — Compares current screenshots against baselines
   - [detect-memory-leaks.sh](scripts/detect-memory-leaks.sh) — Heap snapshot before/after comparison
+  - [check-ux-signals.sh](scripts/check-ux-signals.sh) — Scans source for UX anti-patterns (ambiguous labels, missing aria, jargon)
 
 - **Examples:**
   - [api-test-template.ts](examples/api-test-template.ts) — Reusable fetch-based endpoint test template
   - [playwright-form-matrix.ts](examples/playwright-form-matrix.ts) — 4-case form test template (empty, invalid, valid, server error)
   - [playwright-breakage-listener.ts](examples/playwright-breakage-listener.ts) — pageerror + console listener setup for breakage detection
   - [playwright-route-intercept.ts](examples/playwright-route-intercept.ts) — Simulate API failures, slow network, and third-party blocking
+  - [persona-journey-runner.ts](examples/persona-journey-runner.ts) — Persona-based goal journey execution with friction scoring
+  - [ux-heuristic-evaluator.ts](examples/ux-heuristic-evaluator.ts) — Automated UX heuristic checks, feedback latency, and semantic locator audit
 
 - **Tooling:**
   - [Playwright](https://playwright.dev/) for all browser interaction, DOM inspection, and route interception
   - Playwright `page.on('pageerror')` and `page.on('console')` for error capture
+  - Playwright semantic locators (`getByRole`, `getByLabel`, etc.) for human-centered element selection
   - Chrome DevTools Protocol (CDP) via Playwright for heap snapshots
   - `MutationObserver` injected via `page.evaluate()` for DOM watching
   - `pixelmatch` or Playwright screenshot diff for visual regression
   - [Vitest](https://vitest.dev/) or [Jest](https://jestjs.io/) for unit testing
   - [axe-core](https://github.com/dequelabs/axe-core) for accessibility
   - [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) for performance
-  - `grep` / `ripgrep` for leakage scanning (no install needed)
+  - `grep` / `ripgrep` for leakage scanning and UX signal scanning (no install needed)
 
 - **References (report formatting):**
   - [report-template.md](references/report-template.md) — **MUST follow** this template for every test report
