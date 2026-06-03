@@ -5,7 +5,8 @@ export default {
   enabledDomains: [
     'build', 'security', 'api', 'component', 'accessibility', 
     'performance', 'network', 'dom', 'breakage', 'cross-cutting',
-    'personas', 'heuristics', 'perceived-quality'
+    'personas', 'heuristics', 'perceived-quality', 'visual-perception',
+    'design-system', 'microcopy'
   ],
   reporter: {
     markdown: true,

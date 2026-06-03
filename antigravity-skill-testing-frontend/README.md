@@ -1,77 +1,202 @@
-# f-tester (Frontend Tester CLI & Agent Skill)
+# f-tester Pro Max
+GitHub Release 161 Testing Domains 13 Personas 6 License
 
-`f-tester` is a dual-purpose frontend testing tool. It operates as a comprehensive, standalone **CLI tool** for developers to manually test their UI, check regressions, and scan for vulnerabilities. More powerfully, it acts as a **distributable AI Skill** that teaches AI coding agents exactly how to test frontend applications autonomously, complete with **human-like UX evaluation**.
+npm npm downloads GitHub stars PayPal
 
-You can use it in any web project (React, Vue, Next.js, etc.) regardless of your IDE.
+An AI skill that provides testing intelligence for building bulletproof, human-validated frontends.
 
-## Documentation
-- [Getting Started](docs/getting-started.md)
-- [Configuration Guide](docs/configuration.md)
-- [Persona-Driven Testing](docs/personas.md)
-- [UX Heuristics](docs/heuristics.md)
-- [CI Integration](docs/ci.md)
-- [Reporters (Markdown & JSON)](docs/reporter.md)
-- [Contributing](CONTRIBUTING.md)
+f-tester Pro Max
 
----
+If you find this useful, consider supporting the project:
 
-## 1. Using it as a Standalone CLI
+PayPal Donate
 
-You don't need to install anything to try it out. Just use `npx` in your project folder:
+Other projects
+NextLevelBuilder.io | GoClaw.sh | ClaudeKit.cc | TOSE.sh
 
-```bash
-npx f-tester --help
-```
+What's New in v2.0
+Intelligent Persona-Driven Testing Engine
+The flagship feature of v2.0 is the Persona-Driven User Journey Tester - an AI-powered reasoning engine that simulates real human behaviors to detect UX flaws, breakage points, and accessibility gaps before your users do.
 
-Or install it globally for frequent use:
++----------------------------------------------------------------------------------------+
+|  TARGET: Frontend Application - RECOMMENDED TESTING REGIMEN                            |
++----------------------------------------------------------------------------------------+
+|                                                                                        |
+|  PATTERN: Plan-Validate-Execute                                                        |
+|     Focus: Cross-cutting quality, visual stability, and human usability                |
+|     Core Domains:                                                                      |
+|       1. Build & Environment Validation                                                |
+|       2. Security & Leakage Checks                                                     |
+|       3. API Endpoint Testing                                                          |
+|       4. Browser-Based Visual Testing                                                  |
+|       5. Persona-Driven User Journeys                                                  |
+|                                                                                        |
+|  PERSONAS:                                                                             |
+|     - First-time visitor (Skips onboarding, misreads CTAs)                             |
+|     - Impatient mobile user (Taps wrong targets, abandons easily)                      |
+|     - Keyboard-only user (Relies entirely on Tab/Enter/Escape)                         |
+|     - Error-prone user (Submits invalid data, clicks back mid-flow)                    |
+|                                                                                        |
+|  BREAKAGE DETECTION:                                                                   |
+|     JS Runtime Errors: Full stack traces via pageerror                                 |
+|     Network Failures: Intercepted via Playwright                                       |
+|     Memory Leaks: Heap snapshot comparison                                             |
+|                                                                                        |
+|  UX HEURISTICS: Nielsen's 10 Heuristics Evaluated                                      |
+|     Focus: Clarity, Feedback, Control, Consistency, Trust                              |
+|                                                                                        |
+|  PRE-DELIVERY CHECKLIST:                                                               |
+|     [ ] Zero PII leakage in console/bundle                                             |
+|     [ ] No semantic locator gaps (role/label preferred)                                |
+|     [ ] CLS < 0.1 and fast UI feedback latency (<100ms)                                |
+|     [ ] 4-case form tests passed (Empty, Invalid, Valid, Server Error)                 |
+|                                                                                        |
++----------------------------------------------------------------------------------------+
 
-```bash
-npm install -g f-tester
-```
+How The Persona-Driven Testing Engine Works
+┌─────────────────────────────────────────────────────────────────┐
+│  1. USER REQUEST                                                │
+│     "Test the frontend" or "Run a UX audit"                     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  2. MULTI-DOMAIN SCAN (13 parallel domains)                     │
+│     • Security & Leakage checks                                 │
+│     • API Endpoint validation                                   │
+│     • Visual Regression & DOM tracking                          │
+│     • Cross-cutting quality (theme/scroll/network)              │
+│     • Accessibility (A11Y) compliance                           │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  3. REASONING ENGINE                                            │
+│     • Inject personas into user journeys                        │
+│     • Map interactions to UX heuristics                         │
+│     • Calculate friction & abandonment risk                     │
+│     • Detect exact points of breakage & memory leaks            │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  4. COMPLETE HEALTH REPORT OUTPUT                               │
+│     Grade + Actionable Steps + Visual Evidence                  │
+│     + Narrative Replay + Experience Debt Summary                │
+└─────────────────────────────────────────────────────────────────┘
 
-Example: Scan your `dist` directory for exposed secrets or hardcoded staging URLs:
+13 Hardened Testing Domains
+The reasoning engine includes specialized rules for:
 
-```bash
-npx f-tester scan-leakage ./dist
-```
+Domain	Examples
+Build & Env	Clean builds, .env sync, no debug logs
+Security & Leakage	Exposed keys, baked env variables, internal IPs
+API & Network	Status codes, offline behavior, deduplication, retry logic
+Component & UI	Form state coverage, broken assets, loading states
+Accessibility (A11Y)	Axe-core scans, semantic locators, tab order, contrast
+Browser & Visual	FOUC checks, interactive states, responsive grids, baselines
+Point of Breakage	JS errors, unhandled rejections, DOM mutation breakage
+Persona Journeys	Goal-oriented navigation, hesitation maps, friction scoring
+UX Heuristics	Clarity, control, real-world language matching
+Perceived Quality	Feedback latency, trust signals, microcopy audit
 
-### Available CLI Commands
-- `scan-leakage [dir]`: Scans your build output for API keys, un-substituted environment variables, and internal IP references.
-- `check-ux-signals [dir]`: Scans source code for UX anti-patterns like ambiguous CTA labels or missing ARIA tags.
-- `bundle-size [dir]`: Checks for bundle size regressions.
-- `dom-tests`: Runs Playwright DOM tests and takes screenshots.
-- `diff-screenshots`: Compares current screenshots to baselines.
-- `memory-leaks`: Runs heap snapshot comparisons for memory leaks.
-- `init-skill`: Initializes the AI agent skill in your current project.
-- `run all`: Runs the entire testing suite.
+Features
+13 Testing Domains - A comprehensive 360-degree view of your frontend health
+6 Human Personas - First-time visitor, Impatient mobile, Keyboard-only, Error-prone, etc.
+10 UX Heuristics - Evaluated based on Nielsen's principles
+Playwright Integration - Live browser DOM inspection and screenshot diffing
+Antigravity Browser Subagent - Native AI web driving
+Memory & CLS Profiling - Heap snapshot comparison and layout shift checks
+Semantic Locator Audit - Preference for `getByRole` and `getByLabel` over CSS
 
----
+Installation
+Using AI Assistant Skill (Recommended)
+# Go to your project
+cd /path/to/your/project
 
-## 2. Using it as an AI Agent Skill (The Magic Part)
-
-Most AI coding agents lack context about specialized testing workflows or human user experience. `f-tester` comes with a built-in "Skill" that gives your AI agent specialized knowledge for UI testing, executing a comprehensive 13-domain checklist.
-
-When installed, your AI agent will automatically know how to trigger UI tests, capture DOM baselines, check for HTTP 500 errors, run persona-driven user journeys, evaluate against Nielsen's UX heuristics, and analyze results using Playwright. 
-
-### How to Install the Skill
-
-Simply run this command inside your project directory:
-
-```bash
+# Install for your AI assistant
 npx f-tester init-skill
-```
 
-**What this does:**
-The CLI will automatically generate an `.agent/skills/testing-frontend` directory inside your current project and copy all the specialized AI instructions (`SKILL.md`) and helper scripts into it. 
+Global Install (For standalone CLI usage)
+# Install CLI globally
+npm install -g f-tester
 
-### How to Use the Skill
+# Run across any directory
+f-tester --help
+f-tester scan-leakage ./dist
+f-tester check-ux-signals ./src
 
-Once initialized, just tell your AI coding assistant:
-> *"Check my UI"* or *"Run a frontend test"* or *"Do a UX audit"*
+Prerequisites
+Node 18.x and Playwright are required for browser tests.
 
-Your AI agent will detect the skill, read the instructions, and instantly become a senior QA engineer that follows hardened testing protocols, evaluating the app both technically and from a human perspective.
+# Install playwright browsers
+npx playwright install chromium
 
----
+Usage
+Skill Mode (Auto-activate)
+The skill activates automatically when you request QA, testing, or auditing. Just chat naturally:
 
-## License
-MIT
+Run a comprehensive frontend test on my React app
+
+Check my UI for UX heuristic violations
+
+Find the exact point of breakage in the checkout flow
+
+Run a visual regression test on the dashboard
+
+Workflow Mode (CLI Commands)
+Use the standalone commands to invoke specific domains manually:
+
+npx f-tester scan-leakage ./dist
+npx f-tester check-ux-signals ./src
+npx f-tester dom-tests
+npx f-tester diff-screenshots
+npx f-tester memory-leaks
+
+Example Prompts
+Test the frontend and output a markdown report
+
+Run a UX audit simulating an impatient mobile user
+
+Scan the build output for exposed API keys
+
+Test all form loading and error states
+
+Check the app's perceived quality and trust signals
+
+How It Works
+You ask - Request any testing task (test, audit, QA, evaluate)
+Test Plan Generated - The AI automatically builds a 13-domain checklist tailored to your stack
+Smart Execution - Based on your request, it launches Playwright, evaluates API calls, diffs screenshots, and tracks JS heap size
+Persona Emulation - Simulates human behavior, calculating friction scores and logging hesitations
+Rich Reporting - Delivers a human-readable health grade, visual evidence index, and prioritized actionable fixes
+
+Supported Stacks
+The skill provides automated testing for:
+
+Web Frameworks: React, Next.js, Vue, Nuxt.js, Svelte, Angular, Astro
+Testing Tools: Playwright, axe-core, Lighthouse CI, Vitest, Jest
+
+Architecture & Contributing
+For Users
+The codebase uses Antigravity Browser Subagents to bridge the gap between AI code generation and human-centric browser usage. Always install via `npx f-tester init-skill` to get the latest heuristics.
+
+For Contributors
+If you want to contribute to this project:
+
+# 1. Clone the repository
+git clone https://github.com/nextlevelbuilder/f-tester.git
+cd f-tester
+
+# 2. Understand the structure
+packages/cli/                # Standalone CLI tools (leakage, ux-signals)
+packages/reporter/           # Markdown and JSON report generators
+.agent/skills/               # AI reasoning engine & templates
+scripts/                     # Bash-based fast evaluation scripts
+examples/                    # Playwright & test reference templates
+
+# 3. Create PR (never push directly to main)
+git checkout -b feat/your-feature
+git commit -m "feat: description"
+git push -u origin feat/your-feature
+gh pr create
