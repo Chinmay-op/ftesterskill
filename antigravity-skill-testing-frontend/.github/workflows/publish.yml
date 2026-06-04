@@ -1,0 +1,56 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./antigravity-skill-testing-frontend
+
+      - name: Verify CLI works
+        run: node bin/cli.js --help
+        working-directory: ./antigravity-skill-testing-frontend
+
+      - name: Verify template completeness
+        run: |
+          echo "Checking SKILL.md exists..."
+          test -f templates/skill/SKILL.md
+
+          echo "Checking scripts (expect 10)..."
+          SCRIPT_COUNT=$(ls templates/skill/scripts/*.sh | wc -l)
+          echo "Found $SCRIPT_COUNT scripts"
+          test "$SCRIPT_COUNT" -eq 10
+
+          echo "Checking examples (expect 10)..."
+          EXAMPLE_COUNT=$(ls templates/skill/examples/*.ts | wc -l)
+          echo "Found $EXAMPLE_COUNT examples"
+          test "$EXAMPLE_COUNT" -eq 10
+
+          echo "Checking references..."
+          test -f templates/skill/references/report-template.md
+          test -f templates/skill/references/sample-report.md
+
+          echo "✅ All template files present!"
+        working-directory: ./antigravity-skill-testing-frontend
+
+      - name: Publish to npm
+        run: npm publish
+        working-directory: ./antigravity-skill-testing-frontend
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

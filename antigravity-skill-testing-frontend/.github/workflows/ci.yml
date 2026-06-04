@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./antigravity-skill-testing-frontend
+
+      - name: Verify CLI boots
+        run: node bin/cli.js --help
+        working-directory: ./antigravity-skill-testing-frontend
+
+      - name: Test init-skill
+        run: |
+          mkdir -p /tmp/test-project
+          cd /tmp/test-project
+          node $GITHUB_WORKSPACE/antigravity-skill-testing-frontend/bin/cli.js init-skill
+
+          echo "Checking installed files..."
+          test -f .agent/skills/testing-frontend/SKILL.md
+          test -d .agent/skills/testing-frontend/scripts
+          test -d .agent/skills/testing-frontend/examples
+          test -d .agent/skills/testing-frontend/references
+
+          SCRIPT_COUNT=$(ls .agent/skills/testing-frontend/scripts/*.sh | wc -l)
+          echo "Scripts installed: $SCRIPT_COUNT"
+          test "$SCRIPT_COUNT" -eq 10
+
+          EXAMPLE_COUNT=$(ls .agent/skills/testing-frontend/examples/*.ts | wc -l)
+          echo "Examples installed: $EXAMPLE_COUNT"
+          test "$EXAMPLE_COUNT" -eq 10
+
+          echo "✅ init-skill works correctly!"
+
+      - name: Verify npm pack
+        run: |
+          npm pack --dry-run 2>&1 | head -50
+        working-directory: ./antigravity-skill-testing-frontend

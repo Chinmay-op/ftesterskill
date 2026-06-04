@@ -1,27 +1,65 @@
 {
   "name": "f-tester",
-  "version": "1.0.0",
-  "description": "An open-source CLI tool for comprehensive frontend testing and UI checking",
+  "version": "2.0.0",
+  "description": "AI-powered comprehensive frontend testing skill — 16 testing domains, persona-driven UX evaluation, visual regression, security scanning, and human-like behavioral testing for Antigravity & AI agents",
   "main": "packages/cli/index.js",
   "bin": {
-    "f-tester": "packages/cli/bin/cli.js"
+    "f-tester": "bin/cli.js"
   },
-  "workspaces": [
-    "packages/*"
+  "files": [
+    "bin/",
+    "lib/",
+    "packages/",
+    "templates/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "f-tester.config.ts"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node bin/cli.js --help",
+    "prepublishOnly": "node bin/cli.js --help"
   },
   "keywords": [
     "antigravity",
     "skill",
+    "agent-skill",
+    "ai-skill",
     "testing",
     "frontend",
+    "frontend-testing",
     "qa",
-    "playwright"
+    "playwright",
+    "visual-regression",
+    "ux-testing",
+    "accessibility",
+    "a11y",
+    "security-scanner",
+    "persona-testing",
+    "heuristic-evaluation",
+    "design-system",
+    "microcopy",
+    "core-web-vitals",
+    "leakage-scanner",
+    "dom-testing",
+    "browser-testing"
   ],
-  "author": "",
+  "author": "Chinmay-op",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chinmay-op/ftesterskill.git"
+  },
+  "homepage": "https://github.com/Chinmay-op/ftesterskill#readme",
+  "bugs": {
+    "url": "https://github.com/Chinmay-op/ftesterskill/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "commander": "^12.1.0",
     "cosmiconfig": "^9.0.0",

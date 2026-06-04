@@ -1,0 +1,18 @@
+# Development files
+.github/
+docs/
+examples/
+node_modules/
+.git/
+
+# Development config
+.gitignore
+.npmignore
+*.log
+.DS_Store
+Thumbs.db
+
+# Analysis files
+*.zip
+test-dist/
+test-install/

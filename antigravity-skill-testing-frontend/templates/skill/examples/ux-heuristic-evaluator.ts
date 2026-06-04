@@ -444,6 +444,87 @@ class HeuristicEvaluator {
     }
   }
 
+  // ── Domain 4: Inclusive Accessibility ────────────────────────────────────
+
+  /**
+   * Evaluates inclusive accessibility markers (cognitive, motor, visual)
+   * based on W3C COGA and WCAG 2.5.8 target size.
+   */
+  async checkInclusiveA11y(page: Page, route: string): Promise<void> {
+    // 4g. Reading Level / Jargon check (proxy: sentence length, complex words)
+    const textNodes = await page.evaluate(() => {
+      const texts: string[] = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      let node;
+      while ((node = walker.nextNode())) {
+        const text = node.textContent?.trim();
+        if (text && text.length > 50 && !text.includes("{") && !text.includes("<")) {
+          texts.push(text);
+        }
+      }
+      return texts;
+    });
+
+    for (const text of textNodes) {
+      const sentences = text.split(/[.!?]+/).filter(Boolean);
+      for (const sentence of sentences) {
+        const words = sentence.trim().split(/\s+/);
+        if (words.length > 25) {
+          this.violations.push({
+            route,
+            element: "Long paragraph",
+            heuristic: "H8-aesthetic-clarity",
+            severity: "low",
+            description: `Sentence is very long (${words.length} words): "${sentence.slice(0, 50)}..."`,
+            whyConfusing: "Long, complex sentences increase cognitive load, especially for users with reading disabilities or neurodivergence.",
+            cognitiveLoad: "high",
+            suggestedFix: "Break sentences down. Aim for < 20 words per sentence. Use bullet points for lists.",
+          });
+          break; // One violation per route is enough for this
+        }
+      }
+    }
+
+    // 4f. Progressive Disclosure (Checking if too much is shown at once)
+    const formInputs = await page.locator("input:visible, select:visible, textarea:visible").count();
+    if (formInputs > 15) {
+      this.violations.push({
+        route,
+        element: "Form",
+        heuristic: "H8-aesthetic-clarity",
+        severity: "medium",
+        description: `Form contains ${formInputs} visible inputs on a single screen.`,
+        whyConfusing: "Showing too many inputs at once overwhelms users and increases abandonment risk.",
+        cognitiveLoad: "high",
+        suggestedFix: "Use progressive disclosure: break the form into logical steps or sections (wizard pattern).",
+      });
+    }
+
+    // 4c. Touch Target Sizing (WCAG 2.5.8)
+    const touchTargets = await page.locator("button:visible, a:visible, [role='button']:visible").all();
+    let smallTargets = 0;
+    
+    for (const target of touchTargets.slice(0, 20)) { // Sample first 20
+      const box = await target.boundingBox();
+      if (box && (box.width < 24 || box.height < 24)) {
+        smallTargets++;
+      }
+    }
+    
+    if (smallTargets > 0) {
+      this.violations.push({
+        route,
+        element: "Interactive elements",
+        heuristic: "H3-user-control",
+        severity: "medium",
+        description: `Found ${smallTargets} interactive element(s) smaller than 24x24px.`,
+        whyConfusing: "Small touch targets are hard to activate for users with motor impairments or on mobile devices.",
+        cognitiveLoad: "medium",
+        suggestedFix: "Ensure all interactive elements have a minimum bounding box of 24x24px (preferably 44x44px).",
+      });
+    }
+  }
+
   // ── Report Generation ────────────────────────────────────────────────
 
   /**
@@ -557,6 +638,7 @@ test.describe("Domain 12 & 13: UX Heuristic & Perceived Quality", () => {
       await evaluator.checkErrorPrevention(page, route);
       await evaluator.checkErrorMessages(page, route);
       await evaluator.auditSemanticLocators(page, route);
+      await evaluator.checkInclusiveA11y(page, route);
 
       // Screenshot
       const routeSlug =

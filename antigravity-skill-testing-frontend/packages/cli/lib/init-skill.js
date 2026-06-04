@@ -1,5 +1,3 @@
-module.exports = async function initSkill(cwd) {
-  console.log('Initializing AI agent skill in', cwd);
-  console.log('Done.');
-  return true;
-};
+// Re-export the root-level init-skill module
+const initSkill = require('../../init-skill');
+module.exports = initSkill;
